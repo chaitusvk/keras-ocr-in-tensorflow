@@ -7,18 +7,18 @@ from model import Model
 
 from data import Data
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+#os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+#os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 input_size = 28
 num_class = 27 + 1
 num_layers = 2
-seq_len = 56
+seq_len = 32
 batch_size = 64
 num_units = 256
 word_size = 8
-img_h = 28
-img_w = word_size*28
+img_h = 32
+img_w = 128
 learn_rate = 0.001
 step = 100000
 
@@ -34,12 +34,12 @@ model = Model(img_w=img_w,
               num_layers=num_layers)
 data = Data()
 
-with tf.Session() as sess:
+with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(tf.global_variables(), max_to_keep=5)
     seq_lens = np.ones(batch_size) * (seq_len)
     for i in range(step):
-        inputs, labels = data.next_batch(word_size, batch_size)
+        inputs, labels = data.next_batch(word_size, batch_size,i)
         feed = {
             model.inputs : inputs,
             model.target : labels,
@@ -53,7 +53,9 @@ with tf.Session() as sess:
             feed[model.keep_prob] = 1.0
             loss, err, decode = sess.run([model.loss, model.err, model.decoded], feed_dict=feed)
             ori = data.decode_sparse_tensor(labels)
+            #ori_1 = data.labels_to_text(ori)
             pre = data.decode_sparse_tensor(decode[0])
+            #pre_1 = data.labels_to_text(pre)
             acc = data.hit(pre, ori)
             msg = 'train step: %d, accuracy: %.4f, word error: %.6f, loss: %f, lr: %f' % (i+1, acc, err, loss, learn_rate)
             print(msg)
@@ -63,4 +65,6 @@ with tf.Session() as sess:
             checkpoint_path = os.path.join(model_dir, 'model.ckpt')
             saver.save(sess, checkpoint_path, global_step=i)
             print('save model: ' + checkpoint_path)
-            learn_rate = max(0.000001, learn_rate * 0.98)
+            #learn_rate = max(0.000001, learn_rate * 0.98)
+            learn_rate = 0.0001
+            

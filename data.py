@@ -3,7 +3,6 @@
 import numpy as np
 import cv2
 import codecs
-from tensorflow.examples.tutorials.mnist import input_data
 import cairocffi as cairo
 
 # character classes and matching regex filter
@@ -14,16 +13,20 @@ class Data(object):
     """docstring for Da"""
     def __init__(self):
        # self.mnist = input_data.read_data_sets('data/')
-        word_file = 'wordlists/wordlist_mono_clean.txt'
-        self.f = codecs.open(word_file,mode='r',encoding='utf-8') 
+        word_file = 'wordlists/clean_text.txt'
+        self.f = codecs.open(word_file,mode='r',encoding='utf-8')
+        self.lines = self.f.readlines()
 
-    def next_batch(self, word_size, batch_size):
+    def next_batch(self, word_size, batch_size,epoch):
         imgs = []
         labels = []
-        for _ in range(batch_size):
+        for i in range(batch_size):
             #ims, labs = self.mnist.train.next_batch(word_size)
-            txt = self.get_word()
-            img = self.paint_text(txt,28*word_size,28)
+            txt = self.get_word(i,batch_size,epoch)
+            if(len(txt)==0):
+            	print(" len value zero has come")
+            	pass
+            img = self.paint_text(txt,128,32)
             img = np.transpose(img)
             img = np.expand_dims(img,axis=3)
             imgs.append(img)
@@ -99,9 +102,10 @@ class Data(object):
 
         return "".join(ret)
 
-    def get_word(self):
-        line = self.f.readline()
-        word = line.rstrip()
+    def get_word(self,item_num,batch_size,epoch):
+        epoch = epoch % 2000
+        index = epoch*batch_size + item_num
+        word = self.lines[index].rstrip()
         return word
 
     def paint_text(self,text, w, h):

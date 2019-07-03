@@ -1,0 +1,53 @@
+Traceback (most recent call last):
+  File "/home/chaitusvk/venv/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1356, in _do_call
+    return fn(*args)
+  File "/home/chaitusvk/venv/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1341, in _run_fn
+    options, feed_dict, fetch_list, target_list, run_metadata)
+  File "/home/chaitusvk/venv/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1429, in _call_tf_sessionrun
+    run_metadata)
+tensorflow.python.framework.errors_impl.InvalidArgumentError: Labels length is zero in batch 26
+	 [[{{node CTCLoss}}]]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "train.py", line 50, in <module>
+    sess.run(model.op, feed_dict=feed)
+  File "/home/chaitusvk/venv/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 950, in run
+    run_metadata_ptr)
+  File "/home/chaitusvk/venv/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1173, in _run
+    feed_dict_tensor, options, run_metadata)
+  File "/home/chaitusvk/venv/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1350, in _do_run
+    run_metadata)
+  File "/home/chaitusvk/venv/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1370, in _do_call
+    raise type(e)(node_def, op, message)
+tensorflow.python.framework.errors_impl.InvalidArgumentError: Labels length is zero in batch 26
+	 [[node CTCLoss (defined at /home/chaitusvk/Documents/my_ctc/ctc-crnn-ocr-tensorflow-master (copy)/model.py:41) ]]
+
+Errors may have originated from an input operation.
+Input Source operations connected to node CTCLoss:
+ label/values (defined at /home/chaitusvk/Documents/my_ctc/ctc-crnn-ocr-tensorflow-master (copy)/model.py:16)	
+ Placeholder_1 (defined at /home/chaitusvk/Documents/my_ctc/ctc-crnn-ocr-tensorflow-master (copy)/model.py:17)	
+ transpose (defined at /home/chaitusvk/Documents/my_ctc/ctc-crnn-ocr-tensorflow-master (copy)/model.py:37)
+
+Original stack trace for 'CTCLoss':
+  File "train.py", line 34, in <module>
+    num_layers=num_layers)
+  File "/home/chaitusvk/Documents/my_ctc/ctc-crnn-ocr-tensorflow-master (copy)/model.py", line 12, in __init__
+    self.build()
+  File "/home/chaitusvk/Documents/my_ctc/ctc-crnn-ocr-tensorflow-master (copy)/model.py", line 41, in build
+    self.cost = tf.nn.ctc_loss(labels=self.target, inputs=self.logits, sequence_length=self.seq_len)
+  File "/home/chaitusvk/venv/lib/python3.5/site-packages/tensorflow/python/ops/ctc_ops.py", line 176, in ctc_loss
+    ignore_longer_outputs_than_inputs=ignore_longer_outputs_than_inputs)
+  File "/home/chaitusvk/venv/lib/python3.5/site-packages/tensorflow/python/ops/gen_ctc_ops.py", line 335, in ctc_loss
+    name=name)
+  File "/home/chaitusvk/venv/lib/python3.5/site-packages/tensorflow/python/framework/op_def_library.py", line 788, in _apply_op_helper
+    op_def=op_def)
+  File "/home/chaitusvk/venv/lib/python3.5/site-packages/tensorflow/python/util/deprecation.py", line 507, in new_func
+    return func(*args, **kwargs)
+  File "/home/chaitusvk/venv/lib/python3.5/site-packages/tensorflow/python/framework/ops.py", line 3616, in create_op
+    op_def=op_def)
+  File "/home/chaitusvk/venv/lib/python3.5/site-packages/tensorflow/python/framework/ops.py", line 2005, in __init__
+    self._traceback = tf_stack.extract_stack()
+
+

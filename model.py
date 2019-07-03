@@ -17,16 +17,31 @@ class Model(object):
         self.seq_len = tf.placeholder(tf.int32, [None])
         self.keep_prob = tf.placeholder(tf.float32)
         self.lr = tf.placeholder(tf.float32)
+        initilizer = tf.contrib.layers.xavier_initializer( uniform=True, seed=None,dtype=tf.float32)
 
-        conv1 = tf.layers.conv2d(inputs= self.inputs,filters=8,kernel_size=3,padding="same",activation=tf.nn.relu)
+        conv1 = tf.layers.conv2d(inputs= self.inputs,filters=32,kernel_size=3,padding="same",activation=tf.nn.relu,kernel_initializer = initilizer)
         pool1  = tf.layers.max_pooling2d(inputs=conv1,pool_size=[2,2],strides=2)
-        conv2 = tf.layers.conv2d(inputs= pool1,filters=16,kernel_size=3,padding="same",activation=tf.nn.relu)
+        conv2 = tf.layers.conv2d(inputs= pool1,filters=64,kernel_size=3,padding="same",activation=tf.nn.relu,kernel_initializer=initilizer)
         pool2  = tf.layers.max_pooling2d(inputs=conv2,pool_size=[2,2],strides=2)
+        conv3 = tf.layers.conv2d(inputs= pool2,filters=128,kernel_size=3,padding="same",activation=tf.nn.relu,kernel_initializer=initilizer)
+        pool3  = tf.layers.max_pooling2d(inputs=conv3,pool_size=[1,2],strides=[1,2])
+        conv4 = tf.layers.conv2d(inputs= pool3,filters=128,kernel_size=3,padding="same",activation=tf.nn.relu,kernel_initializer=initilizer)
+        pool4  = tf.layers.max_pooling2d(inputs=conv4,pool_size=[1,2],strides=[1,2])
+        conv5 = tf.layers.conv2d(inputs= pool4,filters=256,kernel_size=3,padding="same",activation=tf.nn.relu,kernel_initializer=initilizer)
+        pool5  = tf.layers.max_pooling2d(inputs=conv5,pool_size=[1,2],strides=[1,2])
 
-        rnn_in = tf.reshape(pool2,[self.batch_size,self.img_w//4,self.img_h//4*16])
+        rnn_in_3d = tf.squeeze(pool5,axis=[2])
+        
+        
+        
+        
+        
+        
+
+        #rnn_in = tf.reshape(pool2,[self.batch_size,self.img_w//4,self.img_h//4*16])
         
         m_cell = tf.nn.rnn_cell.MultiRNNCell([self.unit() for _ in range(self.num_layers)])
-        output, _ = tf.nn.dynamic_rnn(m_cell, rnn_in, self.seq_len, dtype=tf.float32, time_major=False)
+        output, _ = tf.nn.dynamic_rnn(m_cell, rnn_in_3d, self.seq_len, dtype=tf.float32, time_major=False)
         h_state = tf.reshape(output, (-1, self.num_units))
 
         w = tf.Variable(tf.truncated_normal([self.num_units, self.num_class], stddev=0.1))
